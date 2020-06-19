@@ -1,0 +1,73 @@
+plugins {
+	id 'org.springframework.boot' version '2.3.1.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'java'
+}
+
+group = 'com.blog'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	compileOnly 'org.projectlombok:lombok'
+
+	runtimeOnly 'org.postgresql:postgresql'
+
+	annotationProcessor 'org.projectlombok:lombok'
+
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+task generateSomeSql() {
+	doLast {
+		File dataSql = file("src/main/resources/data.sql");
+		dataSql.write("");
+		for (int i = 1; i <= 10; i++) {
+			dataSql.append("insert into USERS(" +
+					"id, name, surname, age, nick, password) values" +
+					"(${i}, 'Artur${i}', 'Libera${i}', " +
+					"${26 + i}, 'arczimedes${i}'," +
+					"'password${i}');\n")
+		}
+		for (int i = 1; i <= 50; i++) {
+			int createdBy = 1 + i / 5 - 1 / 5;
+			dataSql.append("insert into POSTS(" +
+					"id, title, content, created," +
+					"createdBy) values" +
+					"(${i}, 'Title Post nr${i}', 'Content Post${i}', '" +
+					LocalDateTime.now().minusHours(50 - i) + "' , ${createdBy});\n")
+		}
+		for (int i = 1; i <= 28; i++) {
+			int createdBy = 1 + i / 5 - 1 / 5;
+			int postId = 1 + i/7 -1/7;
+			dataSql.append("insert into COMMENTS(" +
+					"id, postId, content, created," +
+					"createdBy) values" +
+					"(${i}, ${postId}, 'Content Comment${i}', '" +
+					LocalDateTime.now().minusHours(50 - i) + "' , ${createdBy});\n")
+
+		}
+	}
+}
