@@ -3,10 +3,8 @@ package com.blog.restapp.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,5 +18,9 @@ public class Users {
     private int age;
     private String nick;
     private String password;
+
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "createdBy", updatable = false, insertable = false)
+    private List<Posts> posts;
 
 }
